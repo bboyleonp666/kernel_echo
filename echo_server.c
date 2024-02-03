@@ -3,12 +3,15 @@
 #include <stdbool.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <string.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
 #define DEFAULT_SERVER_PORT 9453
 #define MAX_MSG_SIZE 4096
 #define MAX_CONN_BACKLOG 1024
+#define ENABLE_REUSEADDR 1
 
 void usage() {
     fprintf(stdout, "Usage: %s [<server_port>]\n", __FILE__);
@@ -54,6 +57,12 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
+    if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, 
+        &((int) {ENABLE_REUSEADDR}), sizeof(int)) < 0){
+        perror("[error] setsockopt SO_REUSEADDR failed");
+    }
+
+
     /* bind the socket */
     fprintf(stdout, "[info] bind server socket to port: %d\n", server_port);
     if (bind(sock_fd, (struct sockaddr *) &server_addr, sock_len) < 0) {
@@ -70,21 +79,20 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    // while (true) {
+    while (true) {
+        /* accept the incoming connection attempts */
+        int client = accept(sock_fd, (struct sockaddr *) &server_addr, &sock_len);
+        if (client < 0) {
+            perror("[error] accept client");
+            exit(EXIT_FAILURE);
+        }
 
-    /* accept the incoming connection attempts */
-    int client = accept(sock_fd, (struct sockaddr *) &server_addr, &sock_len);
-    if (client < 0) {
-        perror("[error] accept client");
-        exit(EXIT_FAILURE);
+        /* echo the message from the client */
+        char buf[MAX_MSG_SIZE] = { 0 };
+        ssize_t msg_sz = read(client, buf, MAX_MSG_SIZE);
+        printf("[message] '%s' accepted from %s:%d\n", buf, 
+            inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
     }
-
-    /* echo the message from the client */
-    char buf[MAX_MSG_SIZE] = { 0 };
-    ssize_t msg_sz = read(client, buf, MAX_MSG_SIZE);
-    printf("[message] '%s' accepted from %s:%d\n", buf, 
-        inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
-    // }
 
     /* close the socket fd */
     close(sock_fd);
