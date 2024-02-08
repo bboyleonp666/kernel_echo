@@ -11,8 +11,8 @@ static __always_inline void update_sockmap_ops(struct bpf_sock_ops *skops) {
 
     /* force writing the key value pair even if already exist */
     int ret;
-    if ((ret = bpf_map_update_elem(&skops, &skk, &skk, BPF_ANY)) < 0) {
-        bpf_trace_printk("update bpf_sock_ops failed. Code: %d\n", ret);
+    if ((ret = bpf_sock_map_update(skops, &sockops_map, &skk, BPF_ANY)) < 0) {
+        bpf_printk("update bpf_sock_ops failed. Code: %d\n", ret);
     }
 }
 

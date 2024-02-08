@@ -13,6 +13,9 @@
 
 #define SOCKET_PORT 9453
 
+/* follow code snippet from
+ * https://docs.kernel.org/bpf/map_sockmap.html
+ */
 struct sock_key {
     __u32 family;
     __u32 remote_ip4;
@@ -23,9 +26,9 @@ struct sock_key {
 
 struct {
 	__uint(type, BPF_MAP_TYPE_SOCKMAP);
-	__type(key_size, sizeof(struct sock_key));
-	__type(value_size, sizeof(__u32));
 	__uint(max_entries, MAX_SOCK_OPS_MAP_ENTRIES);
+	__type(key, struct sock_key);
+	__type(value, __u64);
 } sockops_map SEC(".maps");
 
 #endif

@@ -26,11 +26,11 @@ int bpf_redir(struct __sk_buff *skb) {
     };
 
     /* redirect the packet */
-    bpf_trace_printk("try redirect port %d --> %d\n", skb->local_port,
+    bpf_printk("try redirect port %d --> %d\n", skb->local_port,
         bpf_ntohl(skb->remote_port));
     long ebpf_redir = bpf_sk_redirect_hash(skb, &sockops_map, &skk, BPF_F_INGRESS);
     if (ebpf_redir != SK_PASS) {
-        bpf_trace_printk("redirect port %d --> %d failed\n", skb->local_port, 
+        bpf_printk("redirect port %d --> %d failed\n", skb->local_port, 
             bpf_ntohl(skb->remote_port));
     }
 
