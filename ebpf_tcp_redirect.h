@@ -20,15 +20,15 @@ struct sock_key {
     __u32 family;
     __u32 remote_ip4;
     __u32 local_ip4;
-    __u32 remote_port;
-    __u32 local_port;
+    __u16 remote_port;
+    __u16 local_port;
 };
 
 struct {
 	__uint(type, BPF_MAP_TYPE_SOCKMAP);
 	__uint(max_entries, MAX_SOCK_OPS_MAP_ENTRIES);
 	__type(key, struct sock_key);
-	__type(value, __u64);
+	__type(value, __u32);
 } sockops_map SEC(".maps");
 
 #endif
