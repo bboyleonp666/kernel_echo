@@ -89,7 +89,7 @@ int main(int argc, char **argv)
     /* read and verify bpf application */
     skel = sockrdr_bpf__open();
     if (!skel) {
-        fprintf(stderr, "Failed to open BPF skeleton, Code: %d\n", skel);
+        fprintf(stderr, "Failed to open BPF skeleton\n");
         return 1;
     }
 
