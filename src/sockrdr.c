@@ -100,15 +100,21 @@ int main(int argc, char **argv)
         goto cleanup;
     }
 
+    /* attach bpf program */
+    err = sockrdr_bpf__attach(skel);
+    if (err) {
+        fprintf(stderr, "Failed to attach BPF skeleton, Code: %d\n", err);
+        goto cleanup;
+    }
+
     /* start daemon */
     while (!exiting) {
-        fprintf(stdout, "Still running...\n");
+        /* fprintf(stdout, "Still running...\n"); */
         sleep(1);
     }
 
 cleanup:
     sockrdr_bpf__destroy(skel);
-
     printf("Goodbye, World!\n");
     return 0;
 }
