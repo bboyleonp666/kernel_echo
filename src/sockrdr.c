@@ -4,6 +4,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <sys/resource.h>
 #include <bpf/libbpf.h>
 
 #include "sockrdr.skel.h"
@@ -19,6 +20,7 @@ static struct env {
     long min_duration_ms;
 } env;
 
+/*
 const char argp_program_doc [] = \
     "Socket redirector\n"
     "\n"
@@ -57,6 +59,7 @@ static const struct argp argp = {
     .parser = parse_arg,
     .doc = argp_program_doc,
 };
+*/
 
 int libbpf_print_fn(enum libbpf_print_level level, const char *format, va_list args)
 {
@@ -73,11 +76,13 @@ int main(int argc, char **argv)
     printf("Hello, World!\n");
 
     /* parse command argument */
+    /*
     err = argp_parse(&argp, argc, argv, 0, NULL, NULL);
     if (err) {
         fprintf(stderr, "Failed to parse arguments, Code: %d\n", err);
         return err;
     }
+    */
 
     /* setup libbpf errors and debug callback */
     libbpf_set_print(libbpf_print_fn);
@@ -86,18 +91,18 @@ int main(int argc, char **argv)
     signal(SIGINT, sig_handler);
     signal(SIGTERM, sig_handler);
 
-    /* read and verify bpf application */
-    skel = sockrdr_bpf__open();
+    /* open and load the bpf map */
+    skel = sockrdr_bpf__open_and_load();
     if (!skel) {
-        fprintf(stderr, "Failed to open BPF skeleton\n");
+        fprintf(stderr, "Failed to open and load BPF skeleton\n");
         return 1;
     }
 
-    /* load and verify bpf program */
-    err = sockrdr_bpf__load(skel);
-    if (err) {
-        fprintf(stderr, "Failed to load and verify BPF skeleton, Code: %d\n", err);
-        goto cleanup;
+    /* verify the bpf map by fd return code */
+    int map_fd = bpf_map__fd(skel->maps.sock_ops);
+    if (map_fd < 0) {
+        fprintf(stderr, "Failed to load bpf program, map_fd: %d\n", map_fd);
+        return 1;
     }
 
     /* attach bpf program */
@@ -107,9 +112,10 @@ int main(int argc, char **argv)
         goto cleanup;
     }
 
+    printf("Running... (Ctrl-C to stop)\n");
     /* start daemon */
     while (!exiting) {
-        /* fprintf(stdout, "Still running...\n"); */
+        fprintf(stderr, ".");
         sleep(1);
     }
 
