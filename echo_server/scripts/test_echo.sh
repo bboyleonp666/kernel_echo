@@ -14,17 +14,17 @@ message="$2"
 
 # Start echo server
 echo "--- Start echo server ---"
-./echo_server $socket_port &
-echo_server_pid=$!
+./server "$socket_port" &
+echo_server_pid="$!"
 echo "echo_server PID: $echo_server_pid"
-sleep 2
+sleep 1
 echo "--------------------------"
 echo
 
 # Send message to echo server
 echo "--- Send message to echo server ---"
-./echo_client "$socket_port" "$message"
+./client "$socket_port" "$message"
 
 # Stop echo server
 echo "--- Stop echo server ---"
-kill -9 $echo_server_pid
+kill -9 "$echo_server_pid"
