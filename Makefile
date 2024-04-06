@@ -22,6 +22,7 @@ install:
 
 .PHONY: clean test
 test: install
+	$(Q)$(MAKE) $(MAKE_FLAG) -C src test
 	$(Q)$(MAKE) $(MAKE_FLAG) -C echo_server test
 
 clean:

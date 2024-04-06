@@ -75,7 +75,11 @@ all: install
 install: $(APPS_BPF)
 
 
-.PHONY: clean 
+.PHONY: test clean 
+test: install
+	$(Q)sudo scripts/load.sh
+	$(Q)sudo scripts/unload.sh
+
 clean:
 	$(call msg,CLEAN)
 	$(Q)rm -rf $(OUTPUT) *.bpf.o
