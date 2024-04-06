@@ -12,7 +12,7 @@ int bpf_sockops_handler(struct bpf_sock_ops *skops){
     if (skops->family != AF_INET)
         return BPF_OK;
 
-    if(skops->remote_ip4 != LOCALHOST_IPV4 || skops->local_ip4 != LOCALHOST_IPV4) {
+    if(skops->remote_ip4 != LOCALHOST_IPV4 || skops->local_ip4 != LOCALHOST_IPV4)
         return BPF_OK;
 
     if (skops->local_port != 9453)
