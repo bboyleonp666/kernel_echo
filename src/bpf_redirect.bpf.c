@@ -5,7 +5,7 @@ char LICENSE[] SEC("license") = "Dual BSD/GPL";
 SEC("sk_msg")
 int bpf_redir(struct sk_msg_md *msg)
 {
-    if(msg->remote_ip4 != LOCALHOST_IPV4 || msg->local_ip4 != LOCALHOST_IPV4) 
+    if (msg->remote_ip4 != LOCALHOST_IPV4 || msg->local_ip4 != LOCALHOST_IPV4) 
         return SK_PASS;
     
     struct sock_key key = {

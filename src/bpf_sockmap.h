@@ -4,6 +4,7 @@
 
 #define LOCALHOST_IPV4 16777343
 #define AF_INET 2
+#define SERVER_PORT 9453
 
 struct sock_key {
     __u32 sip;

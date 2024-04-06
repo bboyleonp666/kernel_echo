@@ -15,7 +15,7 @@ int bpf_sockops_handler(struct bpf_sock_ops *skops){
     if(skops->remote_ip4 != LOCALHOST_IPV4 || skops->local_ip4 != LOCALHOST_IPV4)
         return BPF_OK;
 
-    if (skops->local_port != 9453)
+    if (skops->local_port != SERVER_PORT)
         return BPF_OK;
 
 	struct sock_key key = {
