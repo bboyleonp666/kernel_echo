@@ -1,21 +1,29 @@
 CC := clang
 CFLAGS := -g -O2 -Wall -Wextra -I /usr/include/aarch64-linux-gnu
+
 MAKE := make
+MAKE_FLAG :=
 
-PROGS := ebpf_tcp_redirect.o ebpf_sockmap_ops.o
-.PHONY: all clean test
+ifeq ($(V),1)
+	Q =
+	MAKE_FLAG +=
+else
+	Q = @
+	MAKE_FLAG += -s
+endif
 
-all: $(PROGS)
+.PHONY: all install
+all: install
 
-echo_server:
-	$(MAKE) -C echo_server
+install:
+	$(Q)$(MAKE) $(MAKE_FLAG) -C src install
+	$(Q)$(MAKE) $(MAKE_FLAG) -C echo_server install
 
-ebpf_tcp_redirect.o: ebpf_tcp_redirect.c
-	$(CC) $(CFLAGS) -target bpf -c -o $@ $<
 
-ebpf_sockmap_ops.o: ebpf_sockmap_ops.c
-	$(CC) $(CFLAGS) -target bpf -c -o $@ $<
+.PHONY: clean test
+test: install
+	$(Q)$(MAKE) $(MAKE_FLAG) -C echo_server test
 
 clean:
-	$(MAKE) -C echo_server clean
-	rm -f $(PROGS)
+	$(Q)$(MAKE) $(MAKE_FLAG) -C echo_server clean
+	$(Q)$(MAKE) $(MAKE_FLAG) -C src clean

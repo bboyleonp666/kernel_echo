@@ -24,7 +24,8 @@ INCLUDES := -I$(OUTPUT) -I../third_party/libbpf/include/uapi -I$(dir $(VMLINUX))
 CFLAGS := -g -Wall
 ALL_LDFLAGS := $(LDFLAGS) $(EXTRA_LDFLAGS)
 
-APPS = bpf_contrack bpf_redirect# minimal minimal_legacy uprobe kprobe fentry usdt sockfilter tc ksyscall
+APPS := bpf_contrack bpf_redirect
+APPS_BPF := $(addsuffix .bpf.o,$(APPS))
 
 CARGO ?= $(shell which cargo)
 ifeq ($(strip $(CARGO)),)
@@ -68,12 +69,13 @@ endef
 $(call allow-override,CC,$(CROSS_COMPILE)cc)
 $(call allow-override,LD,$(CROSS_COMPILE)ld)
 
-.PHONY: all
-all: bpf_redirect.bpf.o bpf_contrack.bpf.o
+.PHONY: all install
+all: install
+
+install: $(APPS_BPF)
+
 
 .PHONY: clean 
-
-
 clean:
 	$(call msg,CLEAN)
 	$(Q)rm -rf $(OUTPUT) *.bpf.o

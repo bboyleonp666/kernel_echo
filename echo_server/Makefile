@@ -6,17 +6,28 @@ CLIENT_MSG := "Hello from client"
 
 PROGS := server client
 
-.PHONY: all clean test
-all: $(PROGS)
+ifeq ($(V),1)
+	Q =
+else
+	Q = @
+endif
+
+
+.PHONY: all install
+all: install
+
+install: $(PROGS)
 
 server: server.c
-	$(CC) $(CFLAGS) -o $@ $<
+	$(Q)$(CC) $(CFLAGS) -o $@ $<
 
 client: client.c
-	$(CC) $(CFLAGS) -o $@ $<
+	$(Q)$(CC) $(CFLAGS) -o $@ $<
 
-test: $(PROGS)
-	scripts/test_echo.sh $(SOCK_PORT) $(CLIENT_MSG)
+
+.PHONY: test clean
+test: install
+	$(Q)scripts/test_echo.sh $(SOCK_PORT) $(CLIENT_MSG)
 
 clean:
-	rm -f $(PROGS)
+	$(Q)rm -f $(PROGS)
