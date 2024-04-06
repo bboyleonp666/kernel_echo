@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
 
     ssize_t msg_len = strlen(message);
     if (msg_len > MAX_MSG_SIZE) {
-        fprintf(stderr, "[error] message longer than limit: %d\n", MAX_MSG_SIZE);
+        fprintf(stderr, "[error] client: message longer than limit: %d\n", MAX_MSG_SIZE);
         exit(EXIT_FAILURE);
     }
 
@@ -46,22 +46,22 @@ int main(int argc, char **argv) {
         .sin_addr = inet_addr(server_ip)
     };
 
-    fprintf(stdout, "[info] create client socket\n");
+    fprintf(stdout, "[info] client: create socket\n");
     int sock_fd;
     if ((sock_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror("[error] create client socket failed");
+        perror("[error] client: create socket failed");
         exit(EXIT_FAILURE);
     }
 
-    fprintf(stdout, "[info] connect to %s:%d\n", server_ip, server_port);
+    fprintf(stdout, "[info] client: connect to %s:%d\n", server_ip, server_port);
     int status;
     if ((status = connect(sock_fd, (struct sockaddr *) &server_addr, 
         sizeof(server_addr))) < 0) {
-        perror("[error] connect to server failed");
+        perror("[error] client: connect to server failed");
         exit(EXIT_FAILURE);
     }
     send(sock_fd, message, msg_len, 0);
-    printf("[message] '%s' sent to %s:%d\n", message, DEFAULT_SERVER_IP, 
+    printf("[message] client: sent '%s' to %s:%d\n", message, DEFAULT_SERVER_IP, 
         server_port);
 
     close(sock_fd);
